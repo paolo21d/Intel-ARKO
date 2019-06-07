@@ -20,19 +20,33 @@ void refactorImage(int param, int option) {
         al_destroy_display(okno);
         exit(4);
     }
-    //func(locked_region->data, width, height, param, option); //funkcja asemblerowa
+    //func(locked_region->data, pixelQuantity, param, option); //funkcja asemblerowa
 
-    char * imgData = locked_region->data;
+    printf("pixel size: %d, pitch %d\n", locked_region->pixel_size, locked_region->pitch);
+    unsigned char * imgData = locked_region->data;
+    unsigned short red, green, blue, alpha;
     if(imgData == NULL){
         printf("ERROR LOCK DATA\n");
         al_unlock_bitmap(bmp);
         return;
     }
     for(int i=0; i<pixelQuantity; ++i){
-        printf("%d %hi\t", i, *imgData);
-        *imgData = 0;
-        imgData++;
+        blue = (short) *imgData;
+        blue &= 0xff;
+        green = (short) *(imgData+1);
+        green &= 0xff;
+        red = (short) *(imgData+2);
+        red &= 0xff;
+        alpha = (short) *(imgData+3);
+        alpha &= 0xff;
+        printf("%d: b%hi g%hi r%hi a%hi\n", i, blue, green, red, alpha );
+        //*imgData = 0;
+        //*(imgData+1)=0;
+        //*(imgData+2)=0;
+        //*(imgData+3)=0;
+        imgData+=4;
     }
+    //printf("\nPo wypisaniu, teraz unlock\n");
 
     al_unlock_bitmap(bmp);
 }
@@ -50,7 +64,7 @@ int main()
     
     
     okno  = al_create_display( 150, 150 );
-    bmp = al_load_bitmap( "g.bmp" );
+    bmp = al_load_bitmap( "czerwonyWiekszy.bmp" );
     if(!bmp) printf("LOAD FAIL!!\n");
     
     printf("W: %d, H: %d, Flags: %d, Format: %d\n", al_get_bitmap_width(bmp), al_get_bitmap_height(bmp), al_get_bitmap_flags(bmp),  al_get_bitmap_format(bmp));
@@ -76,15 +90,23 @@ int main()
 		}else if(event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_UP){
 			printf("key UP\n");
 			refresh=true;
+            refactorImage(param, option);
+            printf("Po refaktorze\n");
 		}else if(event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_DOWN){
 			printf("key DOWN\n");
 			refresh=true;
+            refactorImage(param, option);
+            printf("Po refaktorze\n");
 		}else if(event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_LEFT){
 			printf("key LEFT\n");
 			refresh=true;
+            refactorImage(param, option);
+            printf("Po refaktorze\n");
 		}else if(event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_RIGHT){
 			printf("key RIGHT\n");
 			refresh=true;
+            refactorImage(param, option);
+            printf("Po refaktorze\n");
 		}else if(event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_R){
 			printf("refresh\n");
 			refresh=true;
@@ -94,7 +116,9 @@ int main()
 		}	
 		
 		if(refresh){ //napisac wyswietlenie obrazka tutaj na nowo
-			refactorImage(param, option);
+			
+            al_clear_to_color( al_map_rgb( 0,255,0 ) );    
+            al_draw_bitmap( bmp, 0, 0, 0 );
             al_flip_display();
 			refresh=false;
 		}	
