@@ -5,7 +5,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
- void func(unsigned char* line[], int pixelQuantity, int operation, int contrast); //contrast=<-255,255>; operation: 0=histogram, 1=kontrast
+ void func(unsigned char* line, int pixelQuantity, int operation, double contrast); //contrast=<-255,255>; operation: 0=histogram, 1=kontrast
 #ifdef __cplusplus
 }
 #endif
@@ -46,9 +46,9 @@ void LoadBmp(const char *fileName)
 
 void refactor(int operation, int contrast){
     //copyMyFile(); //jesli chcemy wykonywac operacje caly czas z tego samego obrazku to wykomentowac, jesli chcemy wykoywac operacje z orginaly to zostawic
-    char* imgData = tmpFileData+138;
-    unsigned char red, green, blue, alpha;
-    /*for(int i=0; i<pixelQuantity; ++i){
+    unsigned char* imgData = tmpFileData+138;
+    /*unsigned char red, green, blue, alpha;
+    for(int i=0; i<pixelQuantity; ++i){
         // blue = (short) *imgData;
         // blue &= 0xff;
         // green = (short) *(imgData+1);
@@ -68,7 +68,7 @@ void refactor(int operation, int contrast){
         imgData+=4;
     }*/
 
-    func(imgData, pixelQuantity, operation, contrast);
+    func(imgData, pixelQuantity, operation, (double)(contrast)/10.0);
 }
 void copyMyFile(){
     for(int i=0; i<fileSize; ++i){
